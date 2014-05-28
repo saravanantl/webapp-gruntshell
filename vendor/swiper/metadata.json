@@ -1,0 +1,5 @@
+{
+	"name": "swiper",
+	"description": "mobile touch slider with hardware accelerated transitions (where supported) and amazing native behavior.",
+	"fetch_uri": "https://github.com/nolimits4web/Swiper"
+}

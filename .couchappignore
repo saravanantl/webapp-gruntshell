@@ -1,0 +1,7 @@
+[
+  ".*\\.swp$",
+	".DS_Store",
+  ".*~$",
+  "runuprev.sh",
+  "mdPush.sh"
+]

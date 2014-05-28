@@ -1,0 +1,320 @@
+﻿<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Estante</title>
+  <link rel="shortcut icon" href="style/images/favicon.ico">
+  <link rel="stylesheet" href="style/jquery.mobile.css" />
+  <link rel="stylesheet" href="style/estante.css" />
+  <script type="text/javascript" src="vendor/utils/_attachments/json2.js"></script>
+  <script type="text/javascript" src="vendor/utils/_attachments/sha1.js"></script>
+  <script type="text/javascript" src="vendor/jquery/_attachments/jquery.js"></script>
+  <script type="text/javascript" src="vendor/jquery/_attachments/jquery.couch.js"></script>
+  <script type="text/javascript" src="vendor/jquery/_attachments/jquery.form.js"></script>
+  <script type="text/javascript" src="vendor/jquery/_attachments/jquery.mobile.js"></script>
+  <script type="text/javascript" src="vendor/jquery/_attachments/jquery.dialog.js"></script>
+  <!-- <script type="text/javascript" src="vendor/futon/futon.js"></script> -->
+  <script type="text/javascript" src="vendor/couchapp/_attachments/_attachments/jquery.couch.app.js"></script>
+  <script type="text/javascript" src="vendor/jquery/_attachments/jquery.mobile.simpledialog.js"></script>
+  <link type="text/css" href="style/jquery.mobile.simpledialog.min.css" rel="stylesheet" />
+  <script type="text/javascript" src="script/library.js"></script>
+  <script type="text/javascript" src="script/urltools.js"></script>
+  <script type="text/javascript" src="script/sync.js"></script>
+  <script>
+    if ($(window).width() > 500) {
+      $('meta[name=viewport]').attr('content','width=device-width, initial-scale=' + initialScale);
+    }
+  </script>
+</head>
+<body>
+  <div data-role="page" id="sync">
+    <div data-role="header" data-theme="b">
+       <h1><strong>Sync Options</strong></h1>
+		<div class="ui-btn-right">
+			<a href="options.html" data-role="button" data-icon="gear" data-rel="dialog" data-iconpos="notext" data-transition="pop" rel="external" class="optionsBtn">Options</a>
+		</div>
+    </div>
+
+    <div data-role="content" class="content">
+      <form class="syncForm" method="get" action="" enctype="multipart/form-data">
+        <input type="hidden"  name="continuousRepFrom" id="continuousRepFrom" value="continuous" />
+        <div data-role="fieldcontain">
+          <label for="repFrom" class="getFrom">Get all library items from:</label>
+          <input type="url" name="repFrom" id="repFrom" class="repURL" placeholder="http://example.com/library" data-inline="true" />
+          <input data-inline="true" type="submit" data-theme="b" class="submitRepFrom" value="Get" />
+        </div>
+        <hr />
+        <div data-role="fieldcontain" id="syncInstructions">
+          <h2>Instructions</h2><p>To <strong>send</strong> all of your library items to another online library, provide the URL to the other online library with their online username and password (for example, https://onlineusername:password@example.com/otherlibrary), indicate if you want to continually send all updates of your items to the other library or if you only want to send your items once, and then click Send.</p><p>To <strong>get</strong> all items from another library, provide the URL to the other online library (for example, http://example.com/otherlibrary), indicate if you want to continuously get all updates of the library or if you only want to get items once, and then click Get.</p><p>To <strong>fully syncronize</strong> your library with the library of a friend, get all items from their library continuously, and have them do the same with your library. Now both libraries will always remain identical, and you will receive automatic updates when your friend makes changes to their library, and they will receive automatic updates when you make changes to your library.</p>
+        </div>
+      </form>
+    <!-- </div> -->
+<!-- from futon status.html -->
+      <table id="status" class="listing" cellspacing="0">
+        <caption>Active Tasks</caption>
+        <thead><tr>
+          <th class='object'>Left</th>
+          <th class='status'>Right</th>
+        </tr></thead>
+        <tbody class="content"></tbody>
+      </table>
+    </div>
+    <script>
+      // from futon.js
+      function Storage() {
+        var storage = this;
+        this.decls = {};
+
+        this.declare = function(name, options) {
+          this.decls[name] = $.extend({}, {
+            scope: "window",
+            defaultValue: null,
+            prefix: ""
+          }, options || {});
+        }
+
+        this.declareWithPrefix = function(prefix, decls) {
+          for (var name in decls) {
+            var options = decls[name];
+            options.prefix = prefix;
+            storage.declare(name, options);
+          }
+        }
+
+        this.del = function(name) {
+          lookup(name, function(decl) {
+            handlers[decl.scope].del(decl.prefix + name);
+          });
+        }
+
+        this.get = function(name, defaultValue) {
+          return lookup(name, function(decl) {
+            var value = handlers[decl.scope].get(decl.prefix + name);
+            if (value !== undefined) {
+              return value;
+            }
+            if (defaultValue !== undefined) {
+              return defaultValue;
+            }
+            return decl.defaultValue;
+          });
+        }
+
+        this.set = function(name, value) {
+          lookup(name, function(decl) {
+            if (value == decl.defaultValue) {
+              handlers[decl.scope].del(decl.prefix + name);
+            } else {
+              handlers[decl.scope].set(decl.prefix + name, value);
+            }
+          });
+        }
+
+        function lookup(name, callback) {
+          var decl = storage.decls[name];
+          if (decl === undefined) {
+            return decl;
+          }
+          return callback(decl);
+        }
+
+        function windowName() {
+          try {
+            return JSON.parse(window.name || "{}");
+          } catch (e) {
+            return {};
+          }
+        }
+
+        // add suffix to cookie names to be able to separate between ports
+        var cookiePrefix = location.port + "_";
+
+        var handlers = {
+
+          "cookie": {
+            get: function(name) {
+              var nameEq = cookiePrefix + name + "=";
+              var parts = document.cookie.split(';');
+              for (var i = 0; i < parts.length; i++) {
+                var part = parts[i].replace(/^\s+/, "");
+                if (part.indexOf(nameEq) == 0) {
+                  return unescape(part.substring(nameEq.length, part.length));
+                }
+              }
+            },
+            set: function(name, value) {
+              var date = new Date();
+              date.setTime(date.getTime() + 14*24*60*60*1000); // two weeks
+              document.cookie = cookiePrefix + name + "=" + escape(value) +
+                "; expires=" + date.toGMTString();
+            },
+            del: function(name) {
+              var date = new Date();
+              date.setTime(date.getTime() - 24*60*60*1000); // yesterday
+              document.cookie = cookiePrefix + name + "=" +
+                "; expires=" + date.toGMTString();
+            }
+          },
+
+          "window": {
+            get: function(name) {
+              return windowName()[name];
+            },
+            set: function(name, value) {
+              var obj = windowName();
+              obj[name] = value || null;
+              window.name = JSON.stringify(obj);
+            },
+            del: function(name) {
+              var obj = windowName();
+              delete obj[name];
+              window.name = JSON.stringify(obj);
+            }
+          }
+
+        };
+      }
+
+      // from futon's status.html
+      // function toTaskDate(timestamp) {
+      //   var d = new Date(timestamp * 1000);
+      //   var hours = d.getHours(), min = d.getMinutes(), secs = d.getSeconds();
+      //   var year = d.getFullYear(), month = d.getMonth() + 1, day = d.getDate();
+
+      //   return String(year) + "-" + (month < 10 ? "0" + month : month) + "-" +
+      //     day + " " + (hours < 10 ? "0" + hours : hours) + ":" +
+      //     (min < 10 ? "0" + min : min) + ":" + (secs < 10 ? "0" + secs : secs);
+      // }
+      var refreshTimeout = null;
+      var progress = 0.00;
+      var taskCnt = 0;
+
+      $.futon = $.futon || {};
+      $.extend($.futon, {storage: new Storage()});
+      $.futon.storage.declare("poll_interval", {defaultValue: 1});
+
+      // from futon's status.html
+      function refresh() {
+        $.couch.activeTasks({
+          success: function(tasks) {
+            clearTimeout(refreshTimeout);
+            $("#status tbody.content").empty();
+
+              $.each(tasks, function(idx, task) {
+                var status, type, object;
+
+                progress = ((parseFloat(task.checkpointed_source_seq) * 100 / parseFloat(task.source_seq)).toFixed(2)).toString();
+                strProgress = progress.toString();
+
+                switch (task.type) {
+                case "database_compaction":
+                  type = "Database compaction";
+                  object = task.database + (task.retry ? " retry" : "");
+                  // status = "Copied " + task.changes_done + " of " +
+                  //   task.total_changes + " changes (" + task.progress + "%)";
+                  status = libLang.progress + " " + strProgress+ "%";
+                  break;
+                case "view_compaction":
+                  type = "View compaction";
+                  object = task.database + ", " + task.design_document;
+                  // status = "Progress " + task.progress + "%";
+                  status = libLang.progress + " " + strProgress + "%";
+                  break;
+                case "indexer":
+                  type = "Indexer";
+                  object = task.database + ", " + task.design_document;
+                  // status = "Processed " + task.changes_done + " of " +
+                  //   task.total_changes + " changes (" + task.progress + "%)";
+                  status = libLang.progress + " " + strProgress + "%";
+                  break;
+                case "replication":
+                  // type = "Replication";
+                  // object = task.source + " to " + task.target;
+                  object = task.source;
+                  // status = "Checkpointed source sequence " +
+                  //   task.checkpointed_source_seq + ", current source sequence " +
+                  //   task.source_seq + ", progress " + task.progress + "%";
+
+                  status = libLang.progress + " " + strProgress + "%";
+                }
+
+                /*
+                 Don't show replications are are currently complete in error.
+
+                 Assuming for now that replications that error have 0 progress.
+				 Testing for task.progress = 100 to avoid dealing with rounding
+				  of progress calculator. Using progress to test for 0.00
+				  because task.progress does round and report 0 even if there
+				  is some small progress.
+
+				  That assumtion is false. We really need to look over at the replication
+				  document to check its status.
+				*/
+                if (task.progress === 100 || progress == 0.00) {
+                	;
+                } else {
+                	taskCnt++;
+	                $("<tr><!--<th></th>--><td class='object'></td><!--<td class='started'>" +
+	                  "</td><td class='updated'></td><td class='pid'>--></td>" +
+	                  "<td class='status'></td></tr>")
+	                  // .find("th").text(type).end()
+	                  .find("td.object").text(object).end()
+	                  // .find("td.started").text(toTaskDate(task.started_on)).end()
+	                  // .find("td.updated").text(toTaskDate(task.updated_on)).end()
+	                  // .find("td.pid").text(task.pid).end()
+	                  .find("td.status").text(status).end()
+	                  .appendTo("#status tbody.content");
+                }
+              });
+
+              if (taskCnt === 0){
+	              $("<tr class='none'><th colspan='6'>"+libLang.noTasks+"</th></tr>")
+	                .appendTo("#status tbody.content");
+              }
+
+              taskCnt = 0;
+
+            // refreshTimeout = setTimeout(refresh,
+            //   parseInt($("#interval input").val(), 10) * 1000);
+            refreshTimeout = setTimeout(refresh, $.futon.storage.get("poll_interval") * 1000);
+          }
+        });
+      }
+
+      function updateInterval(value) {
+        if (isNaN(value)) {
+          value = 5;
+          // $("#interval input").val(value);
+        }
+        // $("#interval .secs").text(value);
+        refresh();
+        $.futon.storage.set("poll_interval", value);
+      }
+
+      $(function() {
+        // var slider = $("#interval input");
+        // slider.val(parseInt($.futon.storage.get("poll_interval")));
+        // if (slider[0].type == "range") {
+        //   slider.bind("input", function() {
+        //     updateInterval(this.value);
+        //   });
+        //   $("#interval .secs").text($("#interval input").val());
+        // } else {
+        //   slider.bind("change", function() {
+        //     updateInterval(this.value);
+        //   });
+        //   $("#interval .secs").hide();
+        // }
+        updateInterval(5); // refresh every 2 seconds
+        refresh();
+      });
+    </script>
+
+<!-- end status.html -->
+    <div data-role="footer">
+      <h4><!-- <a href="https://elestante.net">elestante.net</a> --></h4>
+    </div>
+  </div>
+</body>
+</html>

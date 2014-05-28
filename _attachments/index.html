@@ -1,0 +1,89 @@
+﻿<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Estante</title>
+	<link rel="shortcut icon" href="style/images/favicon.ico">
+	<link rel="stylesheet" href="style/jquery.mobile.css" />
+	<link rel="stylesheet" href="style/estante.css" />
+	<script type="text/javascript" src="vendor/utils/_attachments/json2.js"></script>
+	<script type="text/javascript" src="vendor/utils/_attachments/sha1.js"></script>
+	<script type="text/javascript" src="vendor/jquery/_attachments/jquery.js"></script>
+	<script type="text/javascript" src="vendor/jquery/_attachments/jquery.couch.js"></script>
+	<script type="text/javascript" src="vendor/jquery/_attachments/jquery.form.js"></script>
+	<script type="text/javascript" src="vendor/jquery/_attachments/jquery.mobile.js"></script>
+	<script type="text/javascript" src="vendor/couchapp/_attachments/jquery.couch.app.js"></script>
+	<script type="text/javascript" src="script/library.js"></script>
+	<script>
+		if ($(window).width() > 500) {
+			$('meta[name=viewport]').attr('content','width=device-width, initial-scale=' + initialScale);
+		}
+	</script>
+</head>
+<body>
+<div data-role="page" id="home">
+	<div data-role="header">
+		<h1><strong>Estante</strong></h1>
+		<div class="ui-btn-right">
+			<a href="options.html" data-role="button" data-icon="gear" data-rel="dialog" data-iconpos="notext" data-transition="pop" rel="external" class="optionsBtn">Options</a>
+		</div>
+	</div>
+
+	<div data-role="content" class="content">
+		<ul class="homeList" data-role="listview" data-inset="true">
+			<script type="text/javascript">
+			$('div#home').live("pageshow", function() {
+ 				//$.mobile.showPageLoadingMsg();
+
+				// Check if user is accessing online library
+				if (onlineBase != window.location.host){ // if not browsing online library
+
+					password = sessionStorage.getItem("current");
+
+					// Get onlineDB info
+					/*$.getJSON(currentHost +'/_users/org.couchdb.user%3A'+ homeUser, function(userInfoRoot){
+						userOnlineDB = userInfoRoot.onlineDB; // null if no online db
+						homeUser = userInfoRoot.name;
+
+						// If user has an online library
+						// now will not run since there's no online db created
+						if (userOnlineDB != "" && userOnlineDB != "undefined" && userOnlineDB != null && password != "" && password != null){
+
+							throw "Err1"; // assure this code block not executed.
+
+							onlineHomeDB = "http://"+ userOnlineDB +":"+ password +"@"+ onlineBase +"/"+ userOnlineDB;
+							secureHomeDB = "http://"+ homeUser +":"+ password +"@"+ dbURL[0] +"/"+ homeURL;
+
+
+							// Replicate to onlineDB
+							$.ajax({
+								url: "/_replicate",
+								type: "POST",
+								data: JSON.stringify({"source": secureHomeDB, "target": onlineHomeDB, "filter": "library/no_design", "create_target": true, "userCtx":{"name": userOnlineDB, "db_name": userOnlineDB, "roles": [userOnlineDB]}}),
+								contentType:"application/json"
+
+							});
+
+						};
+					});*/
+
+				};
+
+				if ($('#home ul.homeList li').text() == "" || !$('#home ul.homeList li')){
+					$('#home ul.homeList').categoryShow();
+				}
+
+				$('div#home').trigger('create');
+				//$.mobile.hidePageLoadingMsg();
+			});
+			</script>
+		</ul>
+	</div>
+
+	<div data-role="footer" class="footer">
+		<h4><!-- <a href="https://elestante.net">elestante.net</a> --></h4>
+	</div>
+</div>
+</body>
+</html>

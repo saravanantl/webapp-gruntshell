@@ -1,0 +1,90 @@
+﻿<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Estante</title>
+	<link rel="shortcut icon" href="style/images/favicon.ico">
+	<link rel="stylesheet" href="style/jquery.mobile.css" />
+	<link rel="stylesheet" href="style/estante.css" />
+	<script type="text/javascript" src="vendor/utils/_attachments/json2.js"></script>
+	<script type="text/javascript" src="vendor/utils/_attachments/sha1.js"></script>
+	<script type="text/javascript" src="vendor/jquery/_attachments/jquery.js"></script>
+	<script type="text/javascript" src="vendor/jquery/_attachments/jquery.couch.js"></script>
+	<script type="text/javascript" src="vendor/jquery/_attachments/jquery.form.js"></script>
+	<script type="text/javascript" src="vendor/jquery/_attachments/jquery.mobile.js"></script>
+	<script type="text/javascript" src="vendor/couchapp/_attachments/jquery.couch.app.js"></script>
+    <script type="text/javascript" src="vendor/jquery/_attachments/jquery.mobile.simpledialog.js"></script>    
+	<link type="text/css" href="style/jquery.mobile.simpledialog.min.css" rel="stylesheet" />
+	<script type="text/javascript" src="script/library.js"></script>
+	<script type="text/javascript" src="script/prefs.js"></script>
+	<script type="text/javascript" src="script/about.js"></script>
+	<script>
+		if ($(window).width() > 500) {
+			$('meta[name=viewport]').attr('content','width=device-width, initial-scale=' + initialScale);
+		}
+	</script>
+</head>
+<body>
+	<div data-role="page" id="about">
+		<div data-role="header" data-theme="b">
+			<h1>About</h1>
+			<div class="ui-btn-right">
+				<a href="options.html" data-role="button" data-icon="gear" data-rel="dialog" data-iconpos="notext" data-transition="pop" rel="external" class="optionsBtn">Options</a>
+			</div>
+		</div>
+
+		<div data-role="content" class="content">
+
+			<form class="aboutForm" method="post" action="" enctype="multipart/form-data">
+				<h3 class="librarySize">Total Size of Your Library</h3>
+				<p class="compact">
+					<input class="compact" data-inline="true" data-theme="b" name="compact" id="compact" type="button" value="Clean Library" />
+					<label for="compact"></label>
+				</p>
+			</form>
+
+			<div class="networkSection">
+				<form class="networkForm" method="post" action="" enctype="multipart/form-data">
+					<hr />
+					<h3>Network</h3>
+					<label for="networkSwitch">Put Library on Local Network</label>
+					<select name="networkSwitch" class="networkSwitch" id="networkSwitch" data-role="slider">
+						<option value="networkingOff" class="networkingOff">Networking Off</option>
+						<option value="networkingOn" class="networkingOn">Networking On</option>
+					</select><br />
+					<input type="submit" data-theme="b" id="network" value="Update" data-inline="true" />
+				</form>
+				<hr />
+			</div>
+			
+			<div class="appUpdates">
+				<h3>Software Updates</h3>
+				<form class="appUpdateForm" method="post" action="" enctype="multipart/form-data">
+					
+					<fieldset>
+					<p>
+					<input type="checkbox" name="alwaysUpdateSwitch" name="alwaysUpdateSwitch" id="alwaysUpdateSwitch" value="false"/>
+					<label for="alwaysUpdateSwitch">Always Update</label>
+					</p>
+					</fieldset>
+					<input type="button" data-theme="b" class="updatecheck"  name="updatecheck" id="updatecheck" value="Check For Update" data-inline="true" />
+				</form>
+                <hr />
+			</div>
+
+            <div class="nicknameUpdates">
+				<h3>Nickname Updates</h3>
+				<form class="nicknameForm" method="post" action="" enctype="multipart/form-data">										
+					<input type="text" name="nickname" id="nickname"/>					    					    
+					<input type="button" data-theme="b" class="updatenickname"  name="updatenickname" id="updatenickname" value="Update" data-inline="true" />
+				</form>
+			</div>
+		</div>
+
+		<div data-role="footer">
+			<h4><!-- <a href="https://elestante.net">elestante.net</a> --></h4>
+		</div>
+	</div>
+</body>
+</html>

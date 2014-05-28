@@ -1,0 +1,31 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Estante</title>
+	<link rel="shortcut icon" href="style/images/favicon.ico">
+	<link rel="stylesheet" href="style/jquery.mobile.css" />
+	<link rel="stylesheet" href="style/estante.css" />
+	<script type="text/javascript" src="vendor/utils/_attachments/json2.js"></script>
+	<script type="text/javascript" src="vendor/utils/_attachments/sha1.js"></script>
+	<script type="text/javascript" src="vendor/jquery/_attachments/jquery.js"></script>
+	<script type="text/javascript" src="vendor/jquery/_attachments/jquery.couch.js"></script>
+	<script type="text/javascript" src="vendor/jquery/_attachments/jquery.form.js"></script>
+	<script type="text/javascript" src="vendor/jquery/_attachments/jquery.mobile.js"></script>
+	<script type="text/javascript" src="vendor/couchapp/_attachments/jquery.couch.app.js"></script>
+	<script type="text/javascript" src="script/library.js"></script>
+	<script type="text/javascript" src="script/prefs.js"></script>
+	<script type="text/javascript" src="script/about.js"></script>
+	<script>
+		if ($(window).width() > 500) {
+			$('meta[name=viewport]').attr('content','width=device-width, initial-scale=' + initialScale);
+		}
+		
+		saveUserEnv("test");
+	</script>
+</head>
+<body>
+	<h1>env set to test</h1>
+</body>
+</html>

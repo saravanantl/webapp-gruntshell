@@ -1,0 +1,1 @@
+function(doc) { if (doc.type == 'language') emit(doc); }

@@ -1,0 +1,31 @@
+{
+  "_id": "appinfo",
+  "type": "config",
+  "dev": {
+    "version": "1.13",
+	"minAPKversion" : "1.2",
+    "dataSource": {
+      "templateDB":"http://localhost:5984/estante",
+      "onlineBase":"estante.maflt.org",
+      "designDoc":"library"
+    }
+    },
+    "test": {
+      "version": "1.12",
+	  "minAPKversion" : "1.2",
+      "dataSource": {
+        "templateDB":"https://estanteuser:Dnbatfydnkwadm6f@estante.maflt.org/estante_test",
+        "onlineBase":"estante.maflt.org",
+        "designDoc":"library"
+      }
+      },
+      "prod": {
+        "version": "1.12",
+		"minAPKversion" : "1.2",
+        "dataSource": {
+          "templateDB":"https://estanteuser:Dnbatfydnkwadm6f@estante.maflt.org/estante",
+          "onlineBase":"estante.maflt.org",
+          "designDoc":"library"
+        }
+      }
+    }

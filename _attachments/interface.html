@@ -1,0 +1,78 @@
+﻿<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Estante</title>
+	<link rel="shortcut icon" href="style/images/favicon.ico">
+	<link rel="stylesheet" href="style/jquery.mobile.css" />
+	<link rel="stylesheet" href="style/estante.css" />
+	<script type="text/javascript" src="vendor/utils/_attachments/json2.js"></script>
+	<script type="text/javascript" src="vendor/utils/_attachments/sha1.js"></script>
+	<script type="text/javascript" src="vendor/jquery/_attachments/jquery.js"></script>
+	<script type="text/javascript" src="vendor/jquery/_attachments/jquery.couch.js"></script>
+	<script type="text/javascript" src="vendor/jquery/_attachments/jquery.form.js"></script>
+	<script type="text/javascript" src="vendor/jquery/_attachments/jquery.mobile.js"></script>
+    <script type="text/javascript" src="vendor/couchapp/_attachments/jquery.couch.app.js"></script>
+    <script type="text/javascript" src="vendor/jquery/_attachments/jquery.mobile.simpledialog.js"></script>
+	<link type="text/css" href="style/jquery.mobile.simpledialog.min.css" rel="stylesheet" /> 
+	<script type="text/javascript" src="script/library.js"></script>
+    <script>
+        if ($(window).width() > 500) {
+            $('meta[name=viewport]').attr('content','width=device-width, initial-scale=' + initialScale);
+        }
+    </script>
+</head>
+<body>
+    <div data-role="page" id="interface">
+       <div data-role="header" data-theme="b">
+           <h1><strong>Interface</strong></h1>
+			<div class="ui-btn-right">
+				<a href="options.html" data-role="button" data-icon="gear" data-rel="dialog" data-iconpos="notext" data-transition="pop" rel="external" class="optionsBtn">Options</a>
+			</div>
+       </div>
+
+       <div data-role="content" class="content">
+       <div id="dvUserLanguage" name="dvUserLanguage" data-role="none"></div>
+        <script type="text/javascript" src="script/interface.js"></script>
+        <h3 class="changeLang">Change Language</h3>
+        <form class="languageForm" method="post" action="" enctype="multipart/form-data">
+            <div data-role="fieldcontain">
+                <label for="language" class="language ui-input-text">Interface Language:</label>
+                <select name="language" id="language">
+                    <option></option>
+                </select>
+                <!--<br />
+                <span class="SubmitBtn"><input data-inline="true" type="submit" data-theme="b" class="Submit" value="Submit" /></span>-->
+            </div>
+        </form>
+        <br />        
+        <hr />
+        <div class="dvdeleteLanguage" style="display:none">
+            <h3 class="deleteLang">Delete Language</h3>
+            <form class="deleteLanguageForm" method="post" action="" enctype="multipart/form-data">
+                <div data-role="fieldcontain">
+                    <label for="deleteLanguage" class="language ui-input-text">Interface Language:</label>
+                    <select name="deleteLanguage" id="deleteLanguage">
+                        <option>&nbsp;</option>
+                    </select>
+                    <br />
+                    <br />                    
+                </div>
+                <span class="deleteBtn"><input data-inline="true" type="submit" data-theme="b" class="delete" value="Delete" /></span>
+            </form>
+            <br />                        
+            <hr />
+        </div>
+
+        <h3 class="changeLangText">Change Current Language Text</h3>
+        <p class="languageInstructions"><strong>Instructions:</strong> To update or translate any text used in the interface, change the language title and modify any or all of the fields below, then click submit at the bottom of the page. This will not overwrite any previous default language files, it will create a new language file for the interface to use.</p> <br />
+    </div>
+
+
+    <div data-role="footer">
+        <h4><!-- <a href="https://elestante.net">elestante.net</a> --></h4>
+    </div>
+</div>
+</body>
+</html>

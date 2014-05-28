@@ -1,0 +1,77 @@
+﻿<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Estante</title>
+	<link rel="shortcut icon" href="style/images/favicon.ico">
+	<link rel="stylesheet" href="style/jquery.mobile.css" />
+	<link rel="stylesheet" href="style/estante.css" />
+	<script type="text/javascript" src="vendor/utils/_attachments/json2.js"></script>
+	<script type="text/javascript" src="vendor/utils/_attachments/sha1.js"></script>
+	<script type="text/javascript" src="vendor/jquery/_attachments/jquery.js"></script>
+	<script type="text/javascript" src="vendor/jquery/_attachments/jquery.couch.js"></script>
+	<script type="text/javascript" src="vendor/jquery/_attachments/jquery.form.js"></script>
+	<script type="text/javascript" src="vendor/jquery/_attachments/jquery.mobile.js"></script>
+	<script type="text/javascript" src="vendor/couchapp/_attachments/jquery.couch.app.js"></script>
+	<script type="text/javascript" src="script/library.js"></script>
+	<script>
+		if ($(window).width() > 500) {
+			$('meta[name=viewport]').attr('content','width=device-width, initial-scale=' + initialScale);
+		}
+	</script>
+</head>
+<body>
+	<div data-role="page" id="options">
+		<div data-role="header" data-theme="b">
+				<h1><strong>Options</strong></h1>
+		</div>
+
+
+		<div data-role="content" class="content">
+			<script type="text/javascript">			    
+			    $('div#options').live("pageshow", function () {
+			        $('h1').text(libLang.optionsBtn);
+
+			        $('.about').text(libLang.about);
+			        $('.sync').text(libLang.sync);
+			        $('.interface').text(libLang.interface);
+			        $('.help').text(libLang.helpLabel);
+			        // $('.logout').text(libLang.logout);
+			             			        
+			        // Logout
+			        if (isAccountCreate == 'yes') {
+			            $('#optionlst').prepend('<li><a href="login.html" rel="external" class="logout">' + libLang.logout + '</a></li>');
+			            $('#optionlst').listview('refresh');
+			            $('.logout').live('click', function (event) {
+			                event.preventDefault();
+			                $.couch.logout({ success: function () {
+			                    window.location.replace("login.html");
+
+			                }
+			                });
+			            });
+			        }
+			    });
+			</script>
+
+			<ul id="optionlst" data-role="listview" data-inset="true">
+
+				<!--<li><a href="http://www.thelittlelibrary.com/" rel="external" class="findMore">Find More Online</a></li>-->				
+				<li><a href="about.html" rel="external" class="about">About</a></li>
+				<li><a href="sync.html" rel="external" class="sync">Sync</a></li>
+				<li><a href="interface.html" rel="external" class="interface">Interface</a></li>
+				<li><a href="library.html?type=helpdocs"" rel="external" class="help">Help</a></li>
+				<!--				<li><a href="store.html" rel="external" class="store">Online Libraries</a></li> -->
+
+			</ul>
+
+		</div>
+
+
+		<div data-role="footer">
+			<h4><!-- <a href="https://elestante.net">elestante.net</a> --></h4>
+		</div>
+	</div>
+</body>
+</html>

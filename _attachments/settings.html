@@ -1,0 +1,101 @@
+﻿<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="pragma" content="no-cache" />
+    <title>Estante</title>
+  <link rel="shortcut icon" href="style/images/favicon.ico">
+  <link rel="stylesheet" href="style/jquery.mobile.css" />
+  <link rel="stylesheet" href="style/estante.css" />
+  <script type="text/javascript" src="vendor/utils/_attachments/json2.js"></script>
+  <script type="text/javascript" src="vendor/utils/_attachments/sha1.js"></script>
+  <script type="text/javascript" src="vendor/jquery/_attachments/jquery.js"></script>
+  <script type="text/javascript" src="vendor/jquery/_attachments/jquery.couch.js"></script>
+  <script type="text/javascript" src="vendor/jquery/_attachments/jquery.form.js"></script>
+  <script type="text/javascript" src="vendor/jquery/_attachments/jquery.mobile.js"></script>
+    <script type="text/javascript" src="vendor/couchapp/_attachments/jquery.couch.app.js"></script>
+    <script type="text/javascript" src="vendor/jquery/_attachments/jquery.mobile.simpledialog.js"></script>    
+	<link type="text/css" href="style/jquery.mobile.simpledialog.min.css" rel="stylesheet" /> 
+  <script type="text/javascript" src="script/library.js"></script>
+  <script type="text/javascript" src="script/settings.js"></script>
+    <script>
+        if ($(window).width() > 500) {
+            $('meta[name=viewport]').attr('content','width=device-width, initial-scale=' + initialScale);
+        }
+    </script>
+</head>
+<body>
+  <div data-role="page" id="settings">
+     <div data-role="header">
+       <h1>Add</h1>
+      <div class="ui-btn-right">
+        	<div class="ui-btn-right">
+				<a href="options.html" data-role="button" data-icon="gear" data-rel="dialog" data-iconpos="notext" data-transition="pop" rel="external" class="optionsBtn">Options</a>
+			</div>
+      </div>
+
+  </div>
+
+
+  <div data-role="content">
+     <div id="formHeader" name="formHeader" data-role="none"></div>
+       <form class="settingsForm" method="post" action="" enctype="multipart/form-data">
+
+          <a title="Delete Resource" style="position:absolute; top: 2px; right: 5px; display: none;" rel="DSCI0016.JPG" data-role="button" 
+                    data-icon="delete" data-iconpos="right" data-mini="true" class="deleteThisRescource"><span class="delResources">Delete</span></a>
+
+            <!--<span class="ui-btn-inner ui-btn-corner-all" aria-hidden="true"><span class="ui-btn-text">Delete</span>
+            <span class="ui-icon ui-icon-delete ui-icon-shadow"></span></span></a>-->
+
+          <div data-role="fieldcontain">
+              <label for="title" class="titleLabel">Title</label>
+              <input type="text" name="title" id="title" value="" />
+          </div>
+          <div data-role="fieldcontain">
+              <label for="author" class="authorLabel">Author</label>
+              <input type="text" name="author" id="author" value=""  />
+          </div>
+          <div data-role="fieldcontain">
+              <label for="description" class="descriptionLabel">Description</label>
+              <textarea name="description" id="description"></textarea>
+          </div>
+          <div data-role="fieldcontain">
+              <label for="date" class="dateLabel">Date</label>
+              <input type="text" name="date" id="date" value="" />
+          </div>
+          <div data-role="fieldcontain" class="typeField">
+            <label for="type" class="typeLabel ui-input-text">Type</label>
+              <select name="type" id="type">
+                <option value="books" class="select-books">Books</option>
+                <option value="pictures" class="select-pictures">Pictures</option>
+                <option value="videos" class="select-videos">Videos</option>
+                <option value="audio" class="select-audio">Audio</option>
+                <option value="documents" class="select-documents">Documents</option>
+                <option value="notes" class="select-notes">Notes</option>
+                <option value="courses" class="select-courses">Courses</option>
+              </select>
+          </div>
+          <div data-role="fieldcontain" class="uploadField">
+            <label for="_attachments" id="uploadLabel" class="fileLabel ui-input-text">File</label>
+              <!--<button id="upload" name="upload" data-inline="true">Upload New File</button>-->
+              <input type="file" name="_attachments" id="_attachments" multiple="multiple" />
+          </div>
+
+          <div data-role="fieldcontain" class="finalField">
+              <input type="hidden" name="filename" id="filename" value="" />
+              <input type="hidden" name="cover" id="cover" value="none" />
+              <input type="hidden" name="_id" id="_id" value="" />
+              <input type="hidden" name="_rev" id="_rev" value="" />
+              <input id="settingsSubmit" name="settingsSubmit" type="submit" data-theme="b" class="Submit" value="Submit" />
+          </div>
+          <!-- <p id="serverResponse"></p> -->
+      </form>
+  </div>
+
+  <div data-role="footer">
+      <h4><!-- <a href="https://elestante.net">elestante.net</a> --></h4>
+  </div>
+</div>
+</body>
+</html>

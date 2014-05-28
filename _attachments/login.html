@@ -1,0 +1,455 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Estante</title>
+	<link rel="shortcut icon" href="style/images/favicon.ico">
+	<link rel="stylesheet" href="style/jquery.mobile.css" />
+	<link rel="stylesheet" href="style/estante.css" />
+	<script type="text/javascript" src="vendor/utils/_attachments/json2.js"></script>
+	<script type="text/javascript" src="vendor/utils/_attachments/sha1.js"></script>
+	<script type="text/javascript" src="vendor/jquery/_attachments/jquery.js"></script>
+	<script type="text/javascript" src="vendor/jquery/_attachments/jquery.couch.js"></script>
+	<script type="text/javascript" src="vendor/jquery/_attachments/jquery.form.js"></script>
+	<script type="text/javascript" src="vendor/jquery/_attachments/jquery.mobile.js"></script>
+	<script type="text/javascript" src="vendor/couchapp/_attachments/jquery.couch.app.js"></script>
+    <script type="text/javascript" src="vendor/jquery/_attachments/jquery.mobile.simpledialog.js"></script>
+	<link type="text/css" href="style/jquery.mobile.simpledialog.min.css" rel="stylesheet" /> 
+	<script type="text/javascript" src="script/library.js"></script>
+	<script type="text/javascript" src="script/prefs.js"></script>
+	<script>
+		if ($(window).width() > 500) {
+			$('meta[name=viewport]').attr('content','width=device-width, initial-scale=' + initialScale);
+		}
+	</script>
+</head>
+<body>
+	<div data-role="page" id="login">
+		<div data-role="header" data-theme="b">
+			<h1 data-login="login">Estante Login</h1>
+			</div>
+
+		<div data-role="content" class="content">
+
+		<script type="text/javascript">
+            var IsRememberMeChecked = false;
+
+            // Store user credentials in SharedPreferences 
+            function SaveUserCredentials(username, password)
+            {                                           
+                if (window.JsHandler) {                                     
+                    window.JsHandler.saveUserCredentials(username, password);                    
+                }                                                
+            }
+
+            // Get saved user credentials
+            function GetUserCredentials()
+            {                                                
+                if (isRememberMe == "yes") {                                                                             
+                    arrUserCredential = window.JsHandler.getPreferences();                       
+                    userCredential = arrUserCredential.split("~|");          
+                    username = userCredential[0];
+                    password = userCredential[1];                    
+                    userPassword = password;
+                    if(isAccountCreate == "no")
+                    {                  
+                        var loginDB = "http://" + window.location.host + "/_session";
+                        $.ajax({
+                            type: "POST", 
+                            url: loginDB, 
+                            dataType: "json",
+                            data: { name: username, password: password },                                
+                            beforeSend: function (xhr) {
+                                xhr.setRequestHeader('Accept', 'application/json');
+                            },
+                            complete: function (req) {                                    
+                                if (req.status == 200) {
+                                    sessionStorage.setItem("current",password);                                                                                      
+								    $.getJSON(currentHost +'/_users/org.couchdb.user%3A'+ username, function(userInfoRoot){
+									    homeDB = "http://"+ username +":"+ password +"@"+ dbURL[0] +"/"+ homeURL;                                       
+									    window.location.replace("index.html");
+								    });
+                                } else {
+                                    dialog(libLang.invalidUser);
+                                    return;
+                                }                                    
+                            }
+                        });                                                                                                             
+                    }
+                    else if(password != "")
+                    { 
+                      $('input#username').val(username);
+                      $('input#password').val(password);                      
+                      IsRememberMeChecked = true;                        
+                    }
+                }                
+            }            
+
+            // skip account creation
+            function SkipAccountCreation()
+            {                                            
+                uniqueUserId = $.couch.newUUID();                           
+                username = uniqueUserId;
+                password = uniqueUserId;
+                nickname = 'Anonymous_'+ uniqueUserId.substring(0,5);
+                SaveUserCredentials(username, password);
+                saveUserNickname(nickname, password);
+                saveUserInfo("yes", "no");                                                     
+
+                // Set delayed commits to "false" in the config file for added stability
+				$.ajax({
+					url: "/_config/couchdb/delayed_commits",
+					type: "PUT",
+					data: JSON.stringify("false"),
+					contentType:"application/json",
+					error: function (request, status, error) {						
+                        dialog('1. Error setting delayed commits in the database: ' + request.responseText);
+					},
+					success: function(response){
+						console.log('response after delayed_commits: ' + response);
+						if(response){
+							// Change automatic logout from 10 minutes to 100 minutes
+							$.ajax({
+								url: "/_config/couch_httpd_auth/timeout",
+								type: "PUT",
+								data: JSON.stringify("60000"),
+								contentType:"application/json",
+								error: function (request, status, error) {									
+                                    dialog('2. Error setting httpd_auth timeout in the database: ' + request.responseText);
+								},
+								success: function(response1){
+									console.log('response after httpd_auth timeout: ' + response1);
+									if(response1){
+										// Set up user as database admin
+										$.ajax({
+											url: "/_config/admins/"+ username,
+											type: "PUT",
+											async: false,
+											data: JSON.stringify(password),
+											contentType:"application/json",
+											error: function (request, status, error) {													
+                                                    dialog('3. Error setting new admin in the database: ' + request.responseText);
+											},
+											success: function(response2){
+												console.log('response after setting admin: ' + response2);
+												if(response2){
+													setTimeout(function() {
+														$.couch.login({
+															"name": username,
+															"password": password,
+															success: function(response3){
+																console.log('response3 after attempting couch.login: ' + response3);
+																if(response3){																	
+																	sessionStorage.setItem("current", password);																	
+																	$('.loginForm').signupForm(username, password);
+																};
+															},
+														});
+													}, 250);
+												};
+											}
+										});
+									};
+								}
+							});
+						};
+					}
+				});                                
+            }                
+
+			$('div#login').live("pageshow", function() {
+				$('h1').text(libLang.login);
+				$('label.userLabel').text(libLang.userLabel);
+				$('label.passLabel').text(libLang.passLabel);
+                
+                // Show the message in Modal Dialog instead of Alert
+                function dialog(message)
+                {                                            
+                    $('<div>').simpledialog
+                    ({
+                        mode: 'button',                        
+                        headerText: libLang.appName,
+                        headerClose: false,         
+                        buttonPrompt: message,               
+                        buttons : {
+                              'OK': {
+                                    id: 'btn_Ok',
+                                    click: function () {                                  
+                                }
+                            }
+                        }
+                    });
+                    $("#btn_Ok").find('.ui-btn-text').html(libLang.okBtn);
+                }
+                
+				// Get the user info for authentication
+				$.getJSON(currentHost +'/_users', function(userInfo){                
+					if(userInfo.doc_count >= 2) {
+                        $('.loginBtn span.ui-btn-text').text(libLang.login);
+                        $('.loginBtn').before('<div data-role="fieldcontain" class="rememberme ui-field-contain ui-body ui-br" style="display: block;"><input type="checkbox" name="rememberme" id="rememberme" value="Yes">&nbsp;<label for="rememberme" class="remembermeLabel">'+ libLang.rememberMe +'</label></div>');                                                
+						
+						// If logging into online library, make default username same as online library name
+						/*if (onlineBase == window.location.host){
+							$('input#username').val(homeURL);
+						}*/                        
+
+                        if(IsRememberMeChecked)   
+                        {                     
+                            $('#rememberme').prop("checked", true);                        
+                        }
+
+                        $('div#login').trigger('create');
+
+						$('input.login').live('click', function(event){
+							event.preventDefault();
+
+							username = $.trim($('input#username').val());
+							password = $('input#password').val();
+							
+						
+							/*if (onlineBase == window.location.host && username != homeURL){
+								alert(libLang.validUser); // Get text for langauge
+								return
+							}*/
+							if (!username || username.length == 0) {								
+                                dialog(libLang.validUser);
+								return;
+							}
+							else if (!password || password.length == 0) {								
+                                dialog(libLang.validPassword);
+								return;
+							}     
+
+                            var loginDB = "http://" + window.location.host + "/_session";                       
+                            $.ajax({
+                                type: "POST", 
+                                url: loginDB, 
+                                dataType: "json",
+                                data: { name: username, password: password },                                
+                                beforeSend: function (xhr) {
+                                    xhr.setRequestHeader('Accept', 'application/json');
+                                },
+                                complete: function (req) {                                    
+                                    if (req.status == 200) {
+                                        userPassword = password;
+                                        $.mobile.showPageLoadingMsg();
+
+                                        sessionStorage.setItem("current", password);
+
+                                        if ($("#rememberme").is(':checked')) {
+                                            saveUserInfo("yes", "yes");
+                                            SaveUserCredentials(username, password);
+                                        }
+                                        else {
+                                            saveUserInfo("no", "yes");
+                                        }
+
+                                        $.getJSON(currentHost + '/_users/org.couchdb.user%3A' + username, function (userInfoRoot) {
+                                            homeDB = "http://" + username + ":" + password + "@" + dbURL[0] + "/" + homeURL;
+                                            window.location.replace("index.html");
+                                        });
+                                    } else {
+                                        dialog(libLang.invalidUser);
+                                        return;
+                                    }
+                                }
+                            });
+							         
+                            /*                                                   
+							$.couch.login({
+								"name": username,
+								"password": password,
+								success: function(){
+                                    userPassword = password;
+									$.mobile.showPageLoadingMsg();
+
+									sessionStorage.setItem("current",password);
+
+                                    if($("#rememberme").is(':checked'))                 
+                                    {                                           
+                                        saveUserInfo("yes", "yes");
+                                        SaveUserCredentials(username, password);
+                                    }  
+                                    else
+                                    {
+                                        saveUserInfo("no", "yes");
+                                    }                                  
+                            
+									$.getJSON(currentHost +'/_users/org.couchdb.user%3A'+ username, function(userInfoRoot){
+										homeDB = "http://"+ username +":"+ password +"@"+ dbURL[0] +"/"+ homeURL;                                       
+										window.location.replace("index.html");
+								    });
+								}
+							});
+                            */
+						});
+
+					// If not signed up in the database, load signup page
+				} else {                    
+					$('.loginForm').prepend('<div style="text-align:center"><h3>'+libLang.createAccount+'</h3></div>');
+                    $('.loginForm').prepend('<div style="text-align:right"><a href="javascript:void(0)" onclick="SkipAccountCreation();">'+libLang.skipStep+ '</a>&nbsp;</div>');
+					$('.loginBtn .ui-btn-text').text(libLang.createLibrary);
+					$('.login').val(libLang.createLibrary);
+
+					$('.passwordField').after('<div data-role="fieldcontain" class="repeatPasswordField"><label for="password2">'+ libLang.repeatPass +'</label><input type="password" name="password2" id="password2" data-inline="true" /></div>');
+
+					$('.loginBtn').before('<div data-role="collapsible" data-theme="b" data-content-theme="b"><h3>'+libLang.termsHeader+'</h3><p class="terms" style="margin: 20px 0px; border: 1px solid #ccc; padding: 0px 20px; border-radius: 10px; background: #fff;">'+ libLang.terms +'</p></div><div data-role="fieldcontain" class="acceptTermsDiv ui-field-contain ui-body ui-br" style="display: block;"><input type="checkbox" name="acceptTerms" id="acceptTerms" value="Yes">&nbsp;&nbsp;<label for="acceptTerms" class="acceptTermsLabel">'+ libLang.acceptTerms +'</label></div>');
+
+						$('div#login').trigger('create');
+
+						//click event for already have database online
+						$('input#connectOnline').live('click', function(event){
+
+							$('.acceptTermsDiv').fadeToggle();
+							$('.terms').fadeToggle(function(){
+								$('.onlineUserDiv').fadeToggle();
+							});
+							if ( $('input#connectOnline:checked').val()){
+                                //show login button
+                                $('.loginBtn .ui-btn-text').text(libLang.login);
+                             } else {
+                                //show create db button
+                                $('.loginBtn .ui-btn-text').text(libLang.createLibrary);
+                             }
+
+                          });
+                          
+
+						// Sign up new user and create new library and/or connect to previous account
+						$('input.login').live('click', function(event){
+							event.preventDefault();
+
+							username = $.trim($('input#username').val());
+							password = $('input#password').val();
+							password2 = $('input#password2').val();
+							acceptTerms = $('input#acceptTerms:checked').val();
+							/*connectOnline = $('input#connectOnline:checked').val();*/
+                            
+							if (!username || username.length == 0) {								
+                                dialog(libLang.validUser);
+								return;
+							}
+							else if (password != password2) {								
+                                dialog(libLang.validPassword);
+								return;
+							}
+							else if (!password || password.length == 0) {								
+                                dialog(libLang.validPassword);
+								return;
+							}
+                            else if((username.indexOf(':') >=0) || (username.indexOf('@') >= 0)){
+                                dialog(libLang.specialCharNotAllowed);
+								return;
+                            }
+                            else if((password.indexOf(':') >=0) || (password.indexOf('@') >= 0)){
+                                dialog(libLang.specialCharNotAllowed);
+								return;
+                            }
+							
+							saveUserNickname(username, password); // save the username as the nickname for discovery 
+
+							// Set delayed commits to "false" in the config file for added stability
+							$.ajax({
+								url: "/_config/couchdb/delayed_commits",
+								type: "PUT",
+								data: JSON.stringify("false"),
+								contentType:"application/json",
+								error: function (request, status, error) {									
+                                    dialog('1. Error setting delayed commits in the database: ' + request.responseText);
+								},
+								success: function(response){
+									console.log('response after delayed_commits: ' + response);
+									if(response){
+
+										// Change automatic logout from 10 minutes to 100 minutes
+										$.ajax({
+											url: "/_config/couch_httpd_auth/timeout",
+											type: "PUT",
+											data: JSON.stringify("60000"),
+											contentType:"application/json",
+											error: function (request, status, error) {												
+                                                dialog('2. Error setting httpd_auth timeout in the database: ' + request.responseText);
+											},
+											success: function(response1){
+												console.log('response after httpd_auth timeout: ' + response1);
+												if(response1){
+
+													// Set up user as database admin
+													$.ajax({
+														url: "/_config/admins/"+ username,
+														type: "PUT",
+														async: false,
+														data: JSON.stringify(password),
+														contentType:"application/json",
+														error: function (request, status, error) {																
+                                                                dialog('3. Error setting new admin in the database: ' + request.responseText);
+														},
+														success: function(response2){
+															console.log('response after setting admin: ' + response2);
+															if(response2){
+																setTimeout(function() {
+																	$.couch.login({
+																		"name": username,
+																		"password": password,
+																		success: function(response3){
+																			console.log('response3 after attempting couch.login: ' + response3);
+																			if(response3){
+																				if (acceptTerms != "Yes") {																					
+                                                                                    dialog(libLang.acceptTermsNo);
+																					return;
+																				}
+																				sessionStorage.setItem("current",password);
+																				//saveUserNickname(username); // save the username as the nickname for discovery 
+																				$('.loginForm').signupForm(username, password);
+																			};
+																		},
+																	});
+																}, 250);
+															};
+														}
+													});
+												};
+											}
+										});
+									};
+								}
+							});
+						});
+					};
+				});
+			});
+		</script>
+
+<form class="loginForm" method="post" action="" enctype="multipart/form-data">
+    
+	<div data-role="fieldcontain">
+		<label for="username" class="userLabel">Username:</label>
+		<input type="text" name="username" id="username" data-inline="true" autocomplete="off" />
+	</div>
+
+	<div data-role="fieldcontain" class="passwordField">
+		<label for="password" class="passLabel">Password:</label>
+		<input type="password" name="password" id="password" data-inline="true" />        
+	</div>
+
+	<div data-role="fieldcontain" class="loginBtn">
+		<input type="submit" data-theme="b" class="login" value="Login" />        
+	</div>
+
+</form>
+
+</div>
+
+
+<div data-role="footer">
+	<h4><!-- <a href="https://elestante.net">elestante.net</a> --></h4>
+</div>
+</div>
+<script type="text/javascript">
+    $(document).ready(function () {
+        GetUserCredentials();
+    }); 
+</script>
+</body>
+</html>

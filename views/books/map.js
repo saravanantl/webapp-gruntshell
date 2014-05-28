@@ -1,0 +1,1 @@
+function(doc) { if (doc.type == 'books')  emit(doc); }

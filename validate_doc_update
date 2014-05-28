@@ -1,0 +1,49 @@
+function(newDoc, oldDoc, userCtx) {
+   /*if(!userCtx.name) {
+      throw({forbidden: 'Not allowed: Only users allowed to attach files'});
+   }*/
+
+   if(userCtx.roles.indexOf('_admin') === -1) {
+      /*if(userCtx.roles.indexOf(userCtx.name) === -1 ){ throw({forbidden: 'Not allowed'});};*/
+      if(!userCtx.db) {
+         log("VALIDATE_DOC_FUNCTION:ERROR 0");
+         throw({forbidden: 'Not allowed: You are not an admin'});
+      }
+
+     /* if(userCtx.db != userCtx.name) {
+         log("VALIDATE_DOC_FUNCTION:ERROR 1");
+         throw({forbidden:'Not allowed: You are not posting to your database.'});
+      }*/
+   }
+
+   if(newDoc._attachments) {
+      fileArray = new Array('css','epub','gif','htm','html','ico','jpeg','jpg','js','json','m4v','mobi','mov','mp3','mp4','oga','ogg','ogv','pdf','png','properties','svg','txt','webm','xhtml','xml','xsl','xslt','pub','doc','dot','docx','dotx','xls','xlt','xlsx','xltx','ppt','pps','pot','pptx','potx','ppsx','md','bmp');
+
+      mimeArray = new Array('text/*','image/*','video/*','audio/*','application/epub+zip','application/javascript','application/json','application/x-mobipocket-ebook','application/pdf','application/xhtml+xml','application/xml','application/xslt+xml','application/xslt+xml','application/octet-stream','application/x-javascript');
+
+      function getFileExtension(newFiles) {
+         return newFiles.split('.').pop();
+      }
+
+      for (var filename in newDoc._attachments) {
+         newFile = getFileExtension(filename).toLowerCase();
+         log("VALIDATE_DOC_FUNCTION:newFile:'" + newFile.toString() + "'");
+
+         mimeType = newDoc._attachments[filename].content_type;
+         log("VALIDATE_DOC_FUNCTION:mimeType:'" + mimeType.toString() + "'");
+
+       if (fileArray.indexOf(newFile) === -1 && filename != '') {
+            log("VALIDATE_DOC_FUNCTION:ERROR 2");
+            throw({forbidden : 'Not a valid file format.'});
+         }
+
+         /*
+         if(mimeArray.indexOf(mimeType) === -1)
+         {
+            log("VALIDATE_DOC_FUNCTION:ERROR 3");
+            throw({forbidden : 'Not a valid file format.'});
+         };
+         */
+      }
+   }
+}

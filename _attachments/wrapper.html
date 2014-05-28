@@ -1,0 +1,133 @@
+﻿<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="pragma" content="no-cache" />
+	<title>Estante</title>
+	<link rel="shortcut icon" href="style/images/favicon.ico">
+	<link rel="stylesheet" href="style/jquery.mobile.css" />
+	<script type="text/javascript" src="vendor/utils/_attachments/json2.js"></script>
+	<script type="text/javascript" src="vendor/utils/_attachments/sha1.js"></script>
+	<script type="text/javascript" src="vendor/jquery/_attachments/jquery.js"></script>
+	<script type="text/javascript" src="vendor/jquery/_attachments/jquery.couch.js"></script>
+	<script type="text/javascript" src="vendor/jquery/_attachments/jquery.form.js"></script>
+	<script type="text/javascript" src="vendor/jquery/_attachments/jquery.mobile.js"></script>
+	<script type="text/javascript" src="vendor/couchapp/_attachments/_attachments/jquery.couch.app.js"></script>
+	<script type="text/javascript" src="script/library.js"></script>
+	<script>
+		if ($(window).width() > 500) {
+			$('meta[name=viewport]').attr('content','width=device-width, initial-scale=' + initialScale);
+		}
+	</script>
+	<style type="text/css">
+	div.ui-page div.ui-content, .ui-footer {
+		max-width: 100%;
+	}
+	div.ui-page div.ui-content {
+		background-color: #fff;
+	}
+	.ui-page .ui-header h1.ui-title {
+		color: #fff;
+		font-weight: bold;
+		font-size: 16px;
+	}
+	</style>
+</head>
+<body>
+	<div data-role="page" id="wrapper">
+		<div data-role="header" data-theme="b">
+			<!-- <a href="index.html" rel="external" data-rel="back" data-role="button" data-icon="arrow-l" class="backBtn">Back</a> -->
+			<h1><strong>Estante</strong></h1>
+			<div class="ui-btn-right">
+				<a href="index.html" rel="external" data-role="button" data-icon="home" data-iconpos="notext" class="homeBtn">Home</a>
+			</div>
+		</div>
+
+		<div data-role="content" class="content">
+			<script type="text/javascript">
+			function decode_utf8(s) {
+				return decodeURIComponent(escape(s));
+			}
+
+			$('div#wrapper').live("pageshow", function() {
+
+				$.mobile.showPageLoadingMsg();
+
+				// Get the URL parameters
+				var itemURL = $('#wrapper').getParameter('url'),
+				itemPath = $('#wrapper').getParameter('path'),
+				itemName = $('#wrapper').getParameter('name');
+
+				// Get the domain from a url string
+				function get_hostname(url) {
+					var m = ((url||'')+'').match(/^http:\/\/[^/]+/);
+					return m ? m[0] : null;
+				}
+
+				// Make the title pretty (with spaces instead of URL encoded)
+				$('h1').text(decode_utf8(unescape(itemName)));
+
+				// Use AJAX to load the new page
+				$('.content').load(itemURL +'/'+ itemPath, function(){
+
+					// Change all relative links to be loaded within this wrapper
+					$('.content a').each(function(){
+						var href = $(this).attr('href');
+						var dsrc = $(this).attr('data-src') ? $(this).attr('data-src') : null;
+
+						if (dsrc === null) {
+							var checkHost = get_hostname(href);
+							if(checkHost == currentHost +'/' || checkHost == '' || checkHost == null){
+								if (href.match(".pdf") || href.match(".mp4")) { // add other file extensions here as needed
+									$(this).attr({'href': itemURL +'/'+ href, 'rel': 'external' });
+								} else {
+									$(this).attr({'href': 'wrapper.html?name='+ itemName +'&url='+ itemURL +'&path='+ href, 'rel': 'external'});
+								}
+							}
+						} else {
+							var checkHost = get_hostname(dsrc);
+							if(checkHost == currentHost +'/' || checkHost == '' || checkHost == null){
+								$(this).attr({'href': itemURL +'/'+ href, 'rel': 'external'});
+								$(this).attr({'data-src': itemURL +'/'+ dsrc });
+							};
+						}
+					});
+
+					$('.content audio').each(function(){
+						src = $(this).attr('src');
+						checkHost = get_hostname(src);
+						if(checkHost == currentHost +'/' || checkHost == '' || checkHost == null){
+						//	$(this).attr({'src': 'wrapper.html?name='+ itemName +'&url='+ itemURL +'&path='+ href, 'rel': 'external'});
+							$(this).attr({'src': itemURL + '/'+ src});
+						};
+					});
+
+					$('.content video').each(function(){
+						src = $(this).attr('src');
+						checkHost = get_hostname(src);
+						if(checkHost == currentHost +'/' || checkHost == '' || checkHost == null){
+						// $(this).attr({'src': 'wrapper.html?name='+ itemName +'&url='+ itemURL +'&path='+ href, 'rel': 'external'});
+						$(this).attr({'src': itemURL + '/'+ src});
+						};
+					});
+
+					$.mobile.hidePageLoadingMsg();
+
+				});
+
+				$('.content a').live('click', function(e){
+					e.preventDefault;
+					currentURL = $(this).attr('href');
+					window.location.replace(currentURL);
+				});
+			});
+			</script>
+		</div>
+
+		<div data-role="footer">
+			<h4><!-- <a href="https://elestante.net">elestante.net</a> --></h4>
+		</div>
+	</div>
+</body>
+</html>
